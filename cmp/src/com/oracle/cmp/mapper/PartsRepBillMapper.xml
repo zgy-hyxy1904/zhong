@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="PartsRepBill">
+	<resultMap type="PartsRepBill" id="partsRepBillMap">
+		<id column="billid" property="billId"></id>
+		<result column="billflag" property="billflag"/>
+		<result column="billcount" property="billcount"/>
+		<result column="billtime" property="billtime"/>
+		<association resultMap = "Parts.partsMap" property="parts" >
+		</association>
+		<association resultMap = "User.userMap" property="user" >
+		</association>
+		<association resultMap = "PartsRepBill.codeMap" property="code" >
+		</association>
+	</resultMap>
+	<resultMap type="Code" id="codeMap">
+		<result column="code" property="code"/>
+		<result column="name" property="name"/>
+		<result column="type" property="type"/>
+	</resultMap>
+
+<!--分页查询-->
+<select id="select" resultMap="partsRepBillMap" parameterType="java.util.Map">
+	select * from biz_partsrepbill b 
+	left outer join sys_code c on b.billtype = c.code
+	left outer join sys_user u on b.billuser = u.UserId
+	left outer join biz_parts p on b.partsid = p.PartsId
+		
+		<where>
+			 <if test="partsName!=null and partsName!=''">
+			 and PartsName like #{partsName} 
+			 </if>
+			 <if test="billFlag!=null and billFlag!=''">
+			 and billflag like #{billFlag} 
+			 </if>
+			 <if test="billType!=null and billType!=''">
+			 and billtype like #{billType} 
+			 </if>
+			 <if test="billTime!=null and billTime!=''">
+			 and billtime like #{billTime} 
+			 </if>
+		</where>
+		
+	limit #{index},#{size} 
+</select>
+
+<!--全部查询-->
+<select id="selectAll" resultMap="codeMap" parameterType="java.util.Map">
+	select * from sys_code 
+		<where>
+			 <if test="billFlag!=null and billFlag!=''">
+			 and type like #{billFlag } 
+			 </if>		
+		</where>
+</select>
+
+<!-- 总个数 -->
+<select id="count" resultType="int" parameterType="java.util.Map">
+		select count(*) from biz_partsrepbill b 
+	left outer join sys_code c on b.billtype = c.code
+	left outer join sys_user u on b.billuser = u.UserId
+	left outer join biz_parts p on b.partsid = p.PartsId
+		
+		<where>
+			 <if test="partsName!=null and partsName!=''">
+			 and PartsName like #{partsName} 
+			 </if>
+			 <if test="billFlag!=null and billFlag!=''">
+			 and billflag like #{billFlag} 
+			 </if>
+			 <if test="billType!=null and billType!=''">
+			 and billtype like #{billType} 
+			 </if>
+			 <if test="billTime!=null and billTime!=''">
+			 and billtime like #{billTime} 
+			 </if>
+		</where>
+		</select>
+		
+<!-- 插入 -->
+	<insert id="insert" parameterType="PartsRepBill">
+		insert into biz_partsrepbill(billflag,billtype,partsid,billcount,billtime,billuser,billexplain) 
+		values(#{billflag},#{code.code},#{parts.partsId},#{billcount},#{billtime},#{user.userId},#{billExplain})
+	</insert>
+</mapper>

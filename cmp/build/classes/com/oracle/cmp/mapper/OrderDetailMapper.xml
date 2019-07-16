@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="OrderDetail">
+<resultMap type="OrderDetail" id="orderDetailMap">
+<id column="OrderDetailId" property="orderDetailId"></id>
+<result column="OrderPartsCount" property="orderPartsCount"></result>
+<association resultMap = "Parts.partsMap" property="parts">
+</association>
+<association resultMap = "Order.orderMap" property="order">
+</association>
+</resultMap>
+
+<!-- 插入 -->
+<insert id = "insert" parameterType = "OrderDetail">
+	insert into biz_orderdetail (PartsId,OrderId,OrderPartsCount)
+	values(#{parts.partsId},#{order.orderId},#{orderPartsCount})
+</insert>
+<!-- 删除1 -->
+<delete id = "delete" parameterType = "int">
+	delete from biz_orderdetail where OrderId = #{orderId};
+</delete>
+<!--ID查询 -->
+<select id="selectById" parameterType="int" resultMap="orderDetailMap">
+     SELECT * FROM biz_orderdetail WHERE OrderId = #{orderId}
+</select>
+</mapper>

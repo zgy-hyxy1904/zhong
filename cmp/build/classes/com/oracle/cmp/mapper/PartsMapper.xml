@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Parts">
+<resultMap type="Parts" id="partsMap">
+<id column="PartsId" property="partsId"></id>
+<result column="PartsName" property="partsName"></result>
+<result column="PartsModel" property="partsModel"></result>
+<result column="PartsLoc" property="partsLoc"></result>
+<result column="PartsProDate" property="partsProDate"></result>
+<result column="PartsRemark" property="partsRemark"></result>
+<association property="partsRepertory" resultMap="PartsRepertory.partsRepertoryMap"></association>
+</resultMap>
+<!-- 插入 -->
+<insert id = "insert" parameterType = "Parts">
+	insert into biz_parts (PartsId,PartsName,PartsModel,PartsLoc,PartsProDate,partsRemark)
+	values(#{partsId},#{partsName},#{partsModel},#{partsLoc},#{partsProDate},#{partsRemark})
+</insert>
+<!-- 删除 -->
+<delete id = "delete" parameterType = "int">
+	delete from biz_parts where PartsId = #{partsId}	
+</delete>
+<!-- 修改 -->
+<update id = "update" parameterType = "Parts">
+	update biz_parts 
+	<set>
+		<if test="partsName!=null ">
+		PartsName = #{partsName},
+		</if>
+		<if test="partsModel!=null ">
+		PartsModel = #{partsModel},
+		</if>
+		<if test="partsLoc!=null">
+		PartsLoc = #{partsLoc},
+		</if>
+		<if test="partsProDate!=null ">
+		PartsProDate = #{partsProDate},
+		</if>
+		<if test="partsRemark!=null">
+		partsRemark = #{partsRemark},
+		</if>
+	</set>
+	where PartsId = #{partsId}
+</update>
+<!--全部查询-->
+<select id="select" resultMap="partsMap" parameterType="java.util.Map">
+	select *from biz_parts
+		<where>
+			<if test="partsName!=null and partsName!=''">
+			 and PartsName like #{partsName} 
+			 </if>
+		</where>
+	limit #{index},#{size} 
+</select>
+<!--全部查询-->
+<select id="selectAll" resultMap="partsMap" parameterType="java.util.Map">
+	select * from biz_parts 	
+</select>
+<!--ID查询 -->
+<select id="selectById" parameterType="int"
+resultMap="partsMap">
+     SELECT * FROM biz_parts 
+     where PartsId = #{partsId}
+   
+</select>
+<!-- 总个数 -->
+<select id="count" resultType="int" parameterType="java.util.Map">
+		select count(*) from biz_parts 
+			<where>
+				<if test="partsName!=null and partsName!=''">
+					and PartsName like #{partsName} 
+				</if>
+			</where>
+		</select>
+</mapper>

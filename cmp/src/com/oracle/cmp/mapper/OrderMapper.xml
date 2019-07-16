@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Order">
+<resultMap type="Order" id="orderMap">
+<id column="OrderId" property="orderId"></id>
+<result column="OrderCode" property="orderCode"></result>
+<result column="OrderDate" property="orderDate"></result>
+<result column="OrderFlag" property="orderFlag"></result>
+<collection property="orderDetails" ofType="OrderDetail">
+	<id column="OrderDetailId" property="orderDetailId"></id>
+	<result column="OrderPartsCount" property="orderPartsCount"></result>
+	<association resultMap = "Parts.partsMap" property="parts">
+</association>
+</collection>
+</resultMap>
+
+<!-- 插入 -->
+<insert id = "insert" parameterType = "Order" useGeneratedKeys="true" keyProperty="orderId">
+	insert into biz_order (OrderCode,OrderDate,OrderFlag)
+	values(#{orderCode},#{orderDate},#{orderFlag})
+</insert>
+
+<!-- 删除-->
+<delete id = "delete" parameterType = "int">
+	delete from biz_order where OrderId = #{orderId}
+</delete>
+
+<!-- 修改 -->
+<update id = "update" parameterType = "Order">
+	update biz_order 
+	<set>
+		<if test="orderCode!=null ">
+		OrderCode = #{orderCode},
+		</if>
+		<if test="orderDate!=null ">
+		OrderDate = #{orderDate},
+		</if>
+		<if test="orderFlag!=null">
+		OrderFlag = #{orderFlag},
+		</if>
+	</set>
+	where OrderId = #{orderId}
+</update>
+<!--分页，条件查询-->
+<select id="select" resultMap="orderMap" parameterType="java.util.Map">
+	select * from biz_order
+		<where>
+			<if test="orderCode!=null and orderCode!=''">
+			 and OrderCode like #{orderCode} 
+			 </if>
+			 <if test="orderDate!=null and orderDate!=''">
+			 and OrderDate like #{orderDate} 
+			 </if>
+			 <if test="orderFlag!=null and orderFlag!=''">
+			 and OrderFlag like #{orderFlag} 
+			 </if>
+		</where>
+	<if test="index!=null">
+			limit #{index},#{size}
+		</if>
+</select>
+<!--全部查询-->
+<select id="selectAll" resultMap="orderMap" parameterType="java.util.Map">
+	select * from biz_order 	
+</select>
+<!--ID查询 -->
+<select id="selectById" parameterType="int" resultMap="orderMap">
+     SELECT * FROM biz_order o 
+     left outer join biz_orderdetail od on o.OrderId = od.OrderId 
+     left outer join biz_partsrepertory p on p.PartsId = od.PartsId
+	 left outer join biz_parts pa on p.PartsId = pa.PartsId
+     WHERE o.OrderId = #{orderId}
+</select>
+<!-- 总个数 -->
+<select id="count" resultType="int" parameterType="java.util.Map">
+		select count(*) from biz_order
+		<where>
+			<if test="orderCode!=null and orderCode!=''">
+			 and OrderCode like #{orderCode} 
+			 </if>
+			 <if test="orderDate!=null and orderDate!=''">
+			 and OrderDate like #{orderDate} 
+			 </if>
+			 <if test="orderFlag!=null and orderFlag!=''">
+			 and OrderFlag like #{orderFlag} 
+			 </if>
+		</where>
+		</select>
+</mapper>

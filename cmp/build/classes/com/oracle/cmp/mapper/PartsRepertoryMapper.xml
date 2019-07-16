@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="PartsRepertory">
+	<resultMap type="PartsRepertory" id="partsRepertoryMap">
+		<id column="PartsRepId" property="partsRepId"></id>
+		<result column="PartsRepCount" property="partsRepCount"/>
+		<association resultMap = "Parts.partsMap" property="parts" >
+		</association>
+	</resultMap>
+
+
+<!--分页，条件查询-->
+<select id="select" resultMap="partsRepertoryMap" parameterType="java.util.Map">
+	select * from biz_partsrepertory r left outer join biz_parts p on r.PartsId = p.PartsId
+		<where>
+			<if test="partsId!=null and partsId!=''">
+			 and r.PartsId like #{partsId} 
+			 </if>
+			 <if test="partsName!=null and partsName!=''">
+			 and PartsName like #{partsName} 
+			 </if>
+		</where>
+	limit #{index},#{size} 
+</select>
+
+<!-- 全部查询 -->
+<select id="selectAll" resultMap="partsRepertoryMap" parameterType="java.util.Map">
+	select * from biz_partsrepertory r 
+	left outer join biz_parts p on r.PartsId = p.PartsId
+	left outer join biz_orderdetail o on o.PartsId = p.PartsId
+	<where> 
+		<if test="orderId!=null and orderId!=''">
+		and OrderId = #{orderId } 
+		</if>
+	</where>
+		
+</select>
+
+
+<!-- Id查询 -->
+<select id="selectId" resultType="PartsRepertory" parameterType="int">
+	select * from biz_partsrepertory where PartsId = #{partsRepId }
+</select>
+
+<!-- 总个数 -->
+<select id="count" resultType="int" parameterType="java.util.Map">
+		select count(*) from biz_partsrepertory r left outer join biz_parts p on r.PartsId = p.PartsId
+		<where>
+			<if test="partsRepId!=null and partsRepId!=''">
+			 and PartsRepId like #{partsRepId} 
+			 </if>
+			 <if test="partsName!=null and partsName!=''">
+			 and PartsName like #{partsName} 
+			 </if>
+		</where>
+		</select>
+<!-- 更新 -->
+<update id="update" parameterType="PartsRepertory" >
+		update biz_partsrepertory set PartsRepCount = #{partsRepCount}
+		where PartsId = #{parts.partsId}
+	</update>
+</mapper>
